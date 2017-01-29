@@ -19,7 +19,6 @@ app.get('/', function (req, res) {
 })
 
 app.post('/call', function (req, res) {
-  res.json(req.body)
   var youtubeUrl = req.body.video === 'other' ? request.body.custom : req.body.video
   client.calls.create({
     url: `http://${req.hostname}/call.xml?youtube_url=${youtubeUrl}`,
