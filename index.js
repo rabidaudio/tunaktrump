@@ -14,7 +14,8 @@ app.get('/', function(req, res){
     url: `http://${req.hostname}/call.xml`,
     to: process.env.TO_PHONE,
     from: process.env.FROM_PHONE,
-    sendDigits: 'wwwwwwwwwwwwwwww1' // wait 8 seconds, dial 
+    record: true,
+    sendDigits: 'wwwwwwwwwwwwwwww1' // wait 8 seconds, dial 1
   }, function(err, call) {
     if(err){
       res.error(err)
