@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Tunak Tunak Trump</title>
+  </head>
+  <body>
+    <div class="flex-container">
+      <h1><%= calls.length %> Calls made so far!</h1>
+      <ul>
+        <% calls.forEach(function(call){ %>
+        <% function parseSecondsToDuration(seconds) {
+          var i = parseInt(call.duration, 10)
+          var m = Math.floor(i / 60)
+          var s = i % 60
+          return m + ':' + (s < 10 ? '0' : '') + s
+        } %>
+          <li><p>
+            Made: <%= new Date(call.start_time).toLocaleString() %> (<%= parseSecondsToDuration(call.duration) %>)
+            <br/>
+            <% if(call.recordings.length > 0){ %>
+              <audio controls preload="auto">
+                <source src="/recording?uri=<%= call.recordings[0].uri %>" type="audio/mpeg">
+                Your browser does not support the audio tag.
+              </audio>
+              <a href="/recording?uri=<%= call.recordings[0].uri %>">Direct link</a>
+            <% } %>
+          </p></li>
+        <% }); %>
+      </ul>
+    </div>
+  </body>
+</html>
