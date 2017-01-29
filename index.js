@@ -6,20 +6,23 @@ var client = require('twilio')(accountSid, authToken)
 var request = require('request')
 var ytdl = require('ytdl-core')
 var ffmpeg = require('fluent-ffmpeg')
-var fs = require('fs')
+var bodyParser = require('body-parser')
 
 var express = require('express')
 var app = express()
 
 app.set('view engine', 'ejs')
+app.use(bodyParser.urlencoded({ extended: true }))
 
 app.get('/', function (req, res) {
   res.render('index', {})
 })
 
 app.post('/call', function (req, res) {
+  res.json(req.body)
+  var youtubeUrl = req.body.video === 'other' ? request.body.custom : req.body.video
   client.calls.create({
-    url: `http://${req.hostname}/call.xml`,
+    url: `http://${req.hostname}/call.xml?youtube_url=${youtubeUrl}`,
     to: process.env.TO_PHONE,
     from: process.env.FROM_PHONE,
     record: true,
@@ -52,14 +55,15 @@ app.get('/recording', function (req, res) {
   request.get(url).pipe(res)
 })
 
+// expects query ?youtube_url=
 app.all('/call.xml', function (req, res) {
-  res.render('twiml', {hostname: req.hostname})
+  res.render('twiml', {hostname: req.hostname, youtubeUrl: req.query.youtube_url})
 })
 
-// expects query ?url=
+// expects query ?youtube_url=
 app.get('/audio.mp3', function (req, res) {
   res.format({'audio/mpeg': function () {
-    var youtubeStream = ytdl(req.query.url, {
+    var youtubeStream = ytdl(req.query.youtube_url, {
       filter: function (format) {
         return format.container === 'mp4' &&
           format.encoding === 'H.264' &&
@@ -71,19 +75,12 @@ app.get('/audio.mp3', function (req, res) {
       .noVideo()
       .outputFormat('mp3')
       .on('error', function (err) {
-        // res.status(500).json(err)
         console.error(err)
       })
       .on('end', function () {
         console.log('Audio stream finised')
       })
       .pipe(res, { end: true })
-  }})
-})
-
-app.get('/track.mp3', function (req, res) {
-  res.format({'audio/mpeg': function () {
-    fs.createReadStream('./Daler Mehndi - Tunak Tunak Tun Video.mp3').pipe(res)
   }})
 })
 
