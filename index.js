@@ -4,6 +4,8 @@ var accountSid = process.env.ACCOUNT_SID
 var authToken = process.env.AUTH_TOKEN
 var client = require('twilio')(accountSid, authToken)
 var request = require('request')
+var ytdl = require('ytdl-core')
+var ffmpeg = require('fluent-ffmpeg')
 var fs = require('fs')
 
 var express = require('express')
@@ -52,6 +54,31 @@ app.get('/recording', function (req, res) {
 
 app.all('/call.xml', function (req, res) {
   res.render('twiml', {hostname: req.hostname})
+})
+
+// expects query ?url=
+app.get('/audio.mp3', function (req, res) {
+  res.format({'audio/mpeg': function () {
+    var youtubeStream = ytdl(req.query.url, {
+      filter: function (format) {
+        return format.container === 'mp4' &&
+          format.encoding === 'H.264' &&
+          format.audioBitrate !== null
+      }
+    })
+    ffmpeg(youtubeStream)
+      .audioCodec('libmp3lame')
+      .noVideo()
+      .outputFormat('mp3')
+      .on('error', function (err) {
+        // res.status(500).json(err)
+        console.error(err)
+      })
+      .on('end', function () {
+        console.log('Audio stream finised')
+      })
+      .pipe(res, { end: true })
+  }})
 })
 
 app.get('/track.mp3', function (req, res) {

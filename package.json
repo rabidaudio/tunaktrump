@@ -12,8 +12,10 @@
     "dotenv": "^4.0.0",
     "ejs": "^2.5.5",
     "express": "^4.14.1",
+    "fluent-ffmpeg": "^2.1.0",
     "request": "^2.79.0",
     "standard": "^8.6.0",
-    "twilio": "^2.11.1"
+    "twilio": "^2.11.1",
+    "ytdl-core": "^0.7.23"
   }
 }
