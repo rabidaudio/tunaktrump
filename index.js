@@ -60,31 +60,30 @@ app.get('/recording', function (req, res) {
 
 // expects query ?youtube_url=
 app.all('/call.xml', function (req, res) {
-  res.render('twiml', {hostname: req.hostname, youtubeUrl: req.query.youtube_url})
+  res.render('call_config', {hostname: req.hostname, youtubeUrl: req.query.youtube_url})
 })
 
 // expects query ?youtube_url=
 app.get('/audio.mp3', function (req, res) {
-  res.format({'audio/mpeg': function () {
-    var youtubeStream = ytdl(req.query.youtube_url, {
-      filter: function (format) {
-        return format.container === 'mp4' &&
-          format.encoding === 'H.264' &&
-          format.audioBitrate !== null
-      }
+  res.set({'Content-Type': 'audio/mpeg'})
+  var youtubeStream = ytdl(req.query.youtube_url, {
+    filter: function (format) {
+      return format.container === 'mp4' &&
+        format.encoding === 'H.264' &&
+        format.audioBitrate !== null
+    }
+  })
+  ffmpeg(youtubeStream)
+    .audioCodec('libmp3lame')
+    .noVideo()
+    .outputFormat('mp3')
+    .on('error', function (err) {
+      console.error(err)
     })
-    ffmpeg(youtubeStream)
-      .audioCodec('libmp3lame')
-      .noVideo()
-      .outputFormat('mp3')
-      .on('error', function (err) {
-        console.error(err)
-      })
-      .on('end', function () {
-        console.log('Audio stream finised')
-      })
-      .pipe(res, { end: true })
-  }})
+    .on('end', function () {
+      console.log('Audio stream finised')
+    })
+    .pipe(res, { end: true })
 })
 
 var port = process.env.PORT || 5000
