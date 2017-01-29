@@ -36,9 +36,9 @@ app.all('/call.xml', function(req, res){
   res.status(200).send(
     '<?xml version="1.0" encoding="UTF-8"?>' +
       '<Response>'+
-      '<Pause length="90"/>'+
+      '<Pause length="330"/>'+
       '<Say>Yes</Say>'+
-      `<Play>http://${req.hostname}/track.mp3</Play>`+
+      `<Play loop="2">http://${req.hostname}/track.mp3</Play>`+
       '</Response>'
     )
 })
