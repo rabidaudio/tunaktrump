@@ -8,8 +8,11 @@ var fs = require('fs')
 var express = require('express')
 var app = express()
 
-
 app.get('/', function(req, res){
+  fs.createReadStream('./index.html').pipe(res)
+})
+
+app.post('/call', function(req, res){
   client.calls.create({
     url: `http://${req.hostname}/call.xml`,
     to: process.env.TO_PHONE,
@@ -18,10 +21,14 @@ app.get('/', function(req, res){
     sendDigits: 'wwwwwwwwwwwwwwww1' // wait 8 seconds, dial 1
   }, function(err, call) {
     if(err){
-      res.error(err)
+      res.status(500).json(err)
       return
     }
-    res.json(call)
+    res.send(
+      '<h1>Bam!<h1>' +
+      `<p>We are still working on a way to record these,
+        but in the meantime rest assured that it is working. Keep up the fight!</p>`
+    )
   })
 })
 
