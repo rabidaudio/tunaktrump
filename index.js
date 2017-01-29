@@ -14,7 +14,7 @@ app.get('/', function(req, res){
     url: `http://${req.hostname}/call.xml`,
     to: process.env.TO_PHONE,
     from: process.env.FROM_PHONE,
-    sendDigits: 'ww1'
+    sendDigits: 'wwwwwwwwwwwwwwww1' // wait 8 seconds, dial 
   }, function(err, call) {
     if(err){
       res.error(err)
@@ -27,7 +27,12 @@ app.get('/', function(req, res){
 app.all('/call.xml', function(req, res){
   res.status(200).send(
     '<?xml version="1.0" encoding="UTF-8"?>' +
-      `<Response><Play>http://${req.hostname}/track.mp3</Play></Response>`)
+      '<Response>'+
+      '<Pause length="90"/>'+
+      '<Say>Yes</Say>'+
+      `<Play>http://${req.hostname}/track.mp3</Play>`+
+      '</Response>'
+    )
 })
 
 app.get('/track.mp3', function(req, res){
