@@ -16,9 +16,10 @@
           return m + ':' + (s < 10 ? '0' : '') + s
         } %>
           <li><p>
-            Made: <%= new Date(call.start_time).toLocaleString() %> (<%= parseSecondsToDuration(call.duration) %>)
+            <%= call.status === 'in-progress' ? 'In Progress' : 'Made' %>: 
+              <%= call.status === 'in-progress' ? '' : new Date(call.start_time).toLocaleString() %> (<%= parseSecondsToDuration(call.duration) %>)
             <br/>
-            <% if(call.recordings.length > 0){ %>
+            <% if(call.status !== 'in-progress' && call.recordings.length > 0){ %>
               <audio controls preload="auto">
                 <source src="/recording?uri=<%= call.recordings[0].uri %>" type="audio/mpeg">
                 Your browser does not support the audio tag.

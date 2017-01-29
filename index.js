@@ -36,6 +36,10 @@ app.post('/call', function (req, res) {
 app.get('/call_log', function (req, res) {
   client.calls.get({pageSize: 1000}).then(function (callResponse) {
     return Promise.all(callResponse.calls.map(function (call) {
+      if (call.status === 'in-progress') {
+        return Promise.resolve(call)
+      }
+      // otherwise load recordings
       return client.recordings.list({CallSid: call.sid, pageSize: 1}).then(function (recordingResponse) {
         return Object.assign({}, call, {recordings: recordingResponse.recordings})
       })
