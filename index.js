@@ -2,7 +2,8 @@ require('dotenv').config()
 
 var accountSid = process.env.ACCOUNT_SID
 var authToken = process.env.AUTH_TOKEN
-var client = require('twilio')(accountSid, authToken)
+var Twilio = require('twilio')
+var client = new Twilio(accountSid, authToken)
 var request = require('request')
 var ytdl = require('ytdl-core')
 var ffmpeg = require('fluent-ffmpeg')
